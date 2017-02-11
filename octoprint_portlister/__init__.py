@@ -70,13 +70,13 @@ class PortListerPlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.AssetPlu
 		except:
 			self._logger.error("Exception in do_auto_connect %s", get_exception_string())
 
-    def check_connect_status(self, port, *args, **kwargs):
-        self._logger.info("check_connect_status")
+	def check_connect_status(self, port, *args, **kwargs):
+		self._logger.info("check_connect_status")
 
-        if self._printer.is_operational() == False:
-            self._logger.info("printer is not operational")
-            self._printer.disconnect()
-            Timer(self._settings.get(["autoconnect_delay"]), self.do_auto_connect, [port]).start()
+		if self._printer.is_operational() == False:
+                   self._logger.info("printer is not operational")
+                   self._printer.disconnect()
+                   Timer(self._settings.get(["autoconnect_delay"]), self.do_auto_connect, [port]).start()
 
 	def get_settings_defaults(self, *args, **kwargs):
 		return dict(autoconnect_delay=20)
