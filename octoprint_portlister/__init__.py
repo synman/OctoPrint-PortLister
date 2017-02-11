@@ -63,11 +63,20 @@ class PortListerPlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.AssetPlu
 				profile = printer_profile["id"] if "id" in printer_profile else "_default"
 				self._logger.info("Attempting to connect to %s at %d with profile %s" % (autoport, baudrate, repr(profile)))
 				self._printer.connect(port=autoport, baudrate=baudrate, profile=profile)
+				Timer(self._settings.get(["autoconnect_delay"]), self.check_connect_status, [port]).start()
 			else:
 				self._logger.info("realpath no match")
 				self._logger.info("Skipping auto connect on %s because it isn't %s" % (os.path.realpath(port), os.path.realpath(autoport)))
 		except:
 			self._logger.error("Exception in do_auto_connect %s", get_exception_string())
+
+    def check_connect_status(self, port, *args, **kwargs):
+        self._logger.info("check_connect_status")
+
+        if self._printer.is_operational() == False:
+            self._logger.info("printer is not operational")
+            self._printer.disconnect()
+            Timer(self._settings.get(["autoconnect_delay"]), self.do_auto_connect, [port]).start()
 
 	def get_settings_defaults(self, *args, **kwargs):
 		return dict(autoconnect_delay=20)
