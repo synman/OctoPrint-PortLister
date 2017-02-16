@@ -79,7 +79,7 @@ class PortListerPlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.AssetPlu
                    Timer(self._settings.get(["autoconnect_delay"]), self.do_auto_connect, [port]).start()
 
 	def get_settings_defaults(self, *args, **kwargs):
-		return dict(autoconnect_delay=)
+		return dict(autoconnect_delay=5)
 
 	def get_assets(self, *args, **kwargs):
 		return dict(js=["js/portlister.js"])
