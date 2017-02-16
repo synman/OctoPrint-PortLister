@@ -79,7 +79,7 @@ class PortListerPlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.AssetPlu
                    Timer(self._settings.get(["autoconnect_delay"]), self.do_auto_connect, [port]).start()
 
 	def get_settings_defaults(self, *args, **kwargs):
-		return dict(autoconnect_delay=20)
+		return dict(autoconnect_delay=)
 
 	def get_assets(self, *args, **kwargs):
 		return dict(js=["js/portlister.js"])
@@ -92,12 +92,12 @@ class PortListerPlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.AssetPlu
 
 				# use github release method of version check
 				type="github_release",
-				user="markwal",
+				user="synman",
 				repo="OctoPrint-PortLister",
 				current=self._plugin_version,
 
 				# update method: pip
-				pip="https://github.com/markwal/OctoPrint-PortLister/archive/{target_version}.zip"
+				pip="https://github.com/synman/OctoPrint-PortLister/archive/{target_version}.zip"
 			)
 		)
 
