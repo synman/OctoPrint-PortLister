@@ -57,32 +57,24 @@ class PortListerPlugin(octoprint.plugin.StartupPlugin, octoprint.plugin.AssetPlu
 		try:
 			self._logger.info("do_auto_connect")
 			(autoport, baudrate) = self._settings.global_get(["serial", "port"]), self._settings.global_get_int(["serial", "baudrate"])
-			if not baudrate:
- 				autobaudrate = "AUTO"
- 				baudrate = 0
- 			else:
- 				autobaudrate = baudrate
+			if not autoport:
+				autoport = "AUTO"
+			if not port:
+				port = "AUTO"
 			if autoport == "AUTO" or os.path.realpath(autoport) == os.path.realpath(port):
 				self._logger.info("realpath match")
 				printer_profile = self._printer_profile_manager.get_default()
 				profile = printer_profile["id"] if "id" in printer_profile else "_default"
-				self._logger.info("Attempting to connect to %s at %d with profile %s" % (autoport, autobaudrate, repr(profile)))
+				if not self._printer.is_closed_or_error():
+					self._logger.info("Not autoconnecting; printer already connected")
+					return
+				self._logger.info("Attempting to connect to %s at %d with profile %s" % (autoport, baudrate, repr(profile)))
 				self._printer.connect(port=autoport, baudrate=baudrate, profile=profile)
-				Timer(self._settings.get(["autoconnect_delay"]), self.check_connect_status, [port]).start()
 			else:
 				self._logger.info("realpath no match")
 				self._logger.info("Skipping auto connect on %s because it isn't %s" % (os.path.realpath(port), os.path.realpath(autoport)))
 		except:
 			self._logger.error("Exception in do_auto_connect %s", get_exception_string())
-
-	def check_connect_status(self, port, *args, **kwargs):
-		self._logger.info("check_connect_status")
-
-		if self._printer.is_operational() == False:
-                   self._logger.info("printer is not operational")
-                   self._printer.disconnect()
-		   self.do_auto_connect([port])
-                   #Timer(self._settings.get(["autoconnect_delay"]), self.do_auto_connect, [port]).start()
 
 	def get_settings_defaults(self, *args, **kwargs):
 		return dict(autoconnect_delay=20)
@@ -118,4 +110,3 @@ def __plugin_load__():
 	__plugin_hooks__ = {
 		"octoprint.plugin.softwareupdate.check_config": plugin.get_update_information,
 	}
-
